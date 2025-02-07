@@ -1,47 +1,27 @@
 package com.project.safetynet.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity // Indique que cette classe correspond à une table en base de données
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Person {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrémentation
+    private Long id;
     private String firstName;
     private String lastName;
     private String address;
     private String city;
     private String zip;
     private String phone;
-    private String mail;
+    private String email;
 
-
-    public String getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getMail() {
-        return mail;
-    }
+    // Getters et setters (générés avec Lombok)
 
 
 }
