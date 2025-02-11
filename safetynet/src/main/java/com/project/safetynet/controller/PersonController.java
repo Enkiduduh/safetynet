@@ -2,6 +2,7 @@ package com.project.safetynet.controller;
 
 import com.project.safetynet.model.Person;
 import com.project.safetynet.service.PersonService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +24,9 @@ public class PersonController {
 
     @PostMapping
     public Person addPerson(@RequestBody Person person){
+        System.out.println("person added");
         return personService.savePerson(person);
     }
+
 
 }
