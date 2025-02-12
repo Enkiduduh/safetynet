@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity // Indique que cette classe correspond à une table en base de données
+@Table(name = "persons")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,7 +22,20 @@ public class Person {
     private String phone;
     private String email;
 
-    // Getters et setters (générés avec Lombok)
+    public String getFirstName() {
+        return firstName;
+    }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
 
 }
