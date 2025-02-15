@@ -32,6 +32,8 @@ public class FirestationController {
         return firestationService.getPersonsByFirestation(station);
     }
 
+//    @GetMapping("/flood/stations")
+
 
 //    @PostMapping
 //    public Firestation addFirestation(@RequestBody Firestation firestation) {

@@ -38,4 +38,7 @@ public class Person {
         return phone;
     }
 
+    public String getEmail() {
+        return email;
+    }
 }
