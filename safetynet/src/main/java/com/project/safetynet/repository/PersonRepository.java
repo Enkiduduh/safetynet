@@ -14,4 +14,5 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     List<Person> findByEmailIn(List<String> emails);
     @Query("SELECT p.email FROM Person p WHERE p.city = :city")
     List<String> findAllPersonsEmail(@Param("city") String city);
+    List<Person> findByAddress(String address);
 }

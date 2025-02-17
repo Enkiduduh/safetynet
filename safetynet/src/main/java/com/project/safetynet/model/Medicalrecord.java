@@ -1,8 +1,12 @@
 package com.project.safetynet.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -18,9 +22,22 @@ public class Medicalrecord {
     private Long id;
     private String firstName;
     private String lastName;
-    private String birthdate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/dd/yyyy")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate birthdate;
     private List<String> medications;
     private List<String> allergies;
 
 
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
 }

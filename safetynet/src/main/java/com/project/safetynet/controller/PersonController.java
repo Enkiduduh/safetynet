@@ -32,7 +32,12 @@ public class PersonController {
 //    public List<Person> getChildByFamily(@RequestParam String address) {
 //        return personService.getChildByFamily(address);
 //    }
-//
+    @GetMapping("/childAlert")
+    public List<Person> getChildFromAddress(@RequestParam String address){
+        return personService.getChildFromAddress(address);
+    }
+
+
 //    @GetMapping("/phoneAlert")
 //    public List<Person> getPhoneFromPersonByFirestation(@RequestParam int station) {
 //        return personService.getPhoneFromPersonByFirestation(station);
@@ -45,12 +50,12 @@ public class PersonController {
 
 //    @GetMapping("/personInfolastName")
 
+
+
     @GetMapping("/communityEmail")
     public List<PersonEmailDTO> getAllPersonsEmail(@RequestParam String city) {
         return personService.getAllPersonsEmail(city);
     }
-
-
 
     @PostMapping
     public Person addPerson(@RequestBody Person person){
