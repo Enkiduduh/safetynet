@@ -15,4 +15,5 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query("SELECT p.email FROM Person p WHERE p.city = :city")
     List<String> findAllPersonsEmail(@Param("city") String city);
     List<Person> findByAddress(String address);
+    List<Person> findByLastName(String lastName);
 }

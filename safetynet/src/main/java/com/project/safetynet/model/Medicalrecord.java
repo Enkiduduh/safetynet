@@ -40,4 +40,12 @@ public class Medicalrecord {
     public String getFirstName() {
         return firstName;
     }
+
+    public List<String> getMedications() {
+        return medications;
+    }
+
+    public List<String> getAllergies() {
+        return allergies;
+    }
 }

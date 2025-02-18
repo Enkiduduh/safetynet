@@ -1,9 +1,8 @@
 package com.project.safetynet.controller;
 
-import com.project.safetynet.model.Firestation;
-import com.project.safetynet.model.Person;
-import com.project.safetynet.model.PersonDTO;
+import com.project.safetynet.model.*;
 import com.project.safetynet.service.FirestationService;
+import com.project.safetynet.service.PersonService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,18 +21,21 @@ public class FirestationController {
         return "Test endpoint is working!";
     }
 
-//    @GetMapping("/firestationsAll")
-//    public List<Firestation> getAllFirestation() {
-//        return firestationService.getAllFirestation();
-//    }
 
     @GetMapping("/firestation")
     public List<PersonDTO> getPersonsByFirestation(@RequestParam int station) {
         return firestationService.getPersonsByFirestation(station);
     }
 
-//    @GetMapping("/flood/stations")
+    @GetMapping("/phoneAlert")
+    public List<PersonPhoneDTO> getPhoneFromPersonByFirestation(@RequestParam int firestation) {
+        return firestationService.getPhoneFromPersonByFirestation(firestation);
+    }
 
+    @GetMapping("/flood/stations")
+    public List<PersonFireDTO> getAllInfoByStation(@RequestParam List<Integer> stationIds) {
+        return firestationService.getAllInfoByStation(stationIds);
+    }
 
 //    @PostMapping
 //    public Firestation addFirestation(@RequestBody Firestation firestation) {

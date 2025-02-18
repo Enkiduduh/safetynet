@@ -1,12 +1,9 @@
 package com.project.safetynet.model;
 
-
 public class PersonChildDTO {
-    private String firstName;
-    private String lastName;
-    private Integer age;
-
-
+    private final String firstName;
+    private final String lastName;
+    private final Integer age;
 
     public PersonChildDTO(String firstName, String lastName, Integer age) {
         this.firstName = firstName;
