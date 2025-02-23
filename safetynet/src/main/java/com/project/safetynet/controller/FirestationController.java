@@ -6,6 +6,7 @@ import com.project.safetynet.service.PersonService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -33,13 +34,14 @@ public class FirestationController {
     }
 
     @GetMapping("/flood/stations")
-    public List<PersonFireDTO> getAllInfoByStation(@RequestParam List<Integer> stationIds) {
+    public Map<String, List<PersonFireDTO>> getAllInfoByStation(@RequestParam List<Integer> stationIds) {
         return firestationService.getAllInfoByStation(stationIds);
     }
 
-//    @PostMapping
-//    public Firestation addFirestation(@RequestBody Firestation firestation) {
-//        System.out.println("firestation added");
-//        return firestationService.addFirestation(firestation);
-//    }
+    @PostMapping
+    public Firestation addFirestation(@RequestBody Firestation firestation) {
+        System.out.println("firestation added");
+        return firestationService.addFirestation(firestation);
+
+    }
 }

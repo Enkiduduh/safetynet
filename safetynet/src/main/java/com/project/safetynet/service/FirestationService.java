@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,16 +21,12 @@ public class FirestationService {
     private final MedicalrecordRepository medicalrecordRepository;
     private final MedicalrecordService medicalrecordService;
 
+    @Autowired
     public FirestationService(FirestationRepository firestationRepository, PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, MedicalrecordService medicalrecordService) {
         this.firestationRepository = firestationRepository;
         this.personRepository = personRepository;
         this.medicalrecordRepository = medicalrecordRepository;
         this.medicalrecordService = medicalrecordService;
-    }
-
-    public List<Firestation> getAllFirestation() {
-        System.out.println("Test log actif ?");
-        return firestationRepository.findAll();
     }
 
     public Firestation addFirestation(Firestation firestation) {
@@ -71,27 +69,35 @@ public class FirestationService {
                 .toList();
     }
 
-    public List<PersonFireDTO> getAllInfoByStation(List<Integer> stationIds){
+    public Map<String, List<PersonFireDTO>> getAllInfoByStation(List<Integer> stationIds) {
         //Récuperer toutes les adresses désservies par la station
         List<String> addresses = firestationRepository.findByStationIdIn(stationIds);
         if (addresses.isEmpty()) {
             System.out.println("Aucune adresse trouvée pour cette station.");
-            return new ArrayList<>();
+            return new HashMap<>();
         }
         System.out.println("Adresses trouvées: " + addresses);
         List<Person> persons = personRepository.findByAddressIn(addresses);
 
-        return persons.stream()
-                .map(person -> new PersonFireDTO(
-                        person.getFirstName(),
-                        person.getLastName(),
-                        person.getPhone(),
-                        medicalrecordService.calculAge(person.getFirstName(), person.getLastName(), medicalrecordRepository),
-                        medicalrecordService.recoverMedications(person.getFirstName(), person.getLastName(), medicalrecordRepository),
-                        medicalrecordService.recoverAllergies(person.getFirstName(), person.getLastName(), medicalrecordRepository)
-                ))
-                .toList();
+        // Créer une map pour regrouper les personnes par adresse
+        Map<String, List<PersonFireDTO>> result = new HashMap<>();
 
+        for (Person person : persons) {
+            String address = person.getAddress(); // Récupérer l'adresse
+
+            // Transformer la personne en DTO
+            PersonFireDTO dto = new PersonFireDTO(
+                    person.getFirstName(),
+                    person.getLastName(),
+                    person.getPhone(),
+                    medicalrecordService.calculAge(person.getFirstName(), person.getLastName(), medicalrecordRepository),
+                    medicalrecordService.recoverMedications(person.getFirstName(), person.getLastName(), medicalrecordRepository),
+                    medicalrecordService.recoverAllergies(person.getFirstName(), person.getLastName(), medicalrecordRepository)
+            );
+
+            // Ajouter le DTO à la bonne adresse dans la map
+            result.computeIfAbsent(address, k -> new ArrayList<>()).add(dto);
+        }
+        return result;
     }
-
 }

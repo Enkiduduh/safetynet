@@ -4,6 +4,7 @@ import com.project.safetynet.model.*;
 import com.project.safetynet.repository.FirestationRepository;
 import com.project.safetynet.repository.MedicalrecordRepository;
 import com.project.safetynet.repository.PersonRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class PersonService {
     private final MedicalrecordService medicalrecordService;
     private final MedicalrecordRepository medicalrecordRepository;
 
+    @Autowired
     public PersonService(PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, FirestationRepository firestationRepository, MedicalrecordService medicalrecordService) {
         this.personRepository = personRepository;
         this.firestationRepository = firestationRepository;

@@ -2,6 +2,7 @@ package com.project.safetynet.service;
 
 import com.project.safetynet.model.Medicalrecord;
 import com.project.safetynet.repository.MedicalrecordRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ public class MedicalrecordService {
 
     private final MedicalrecordRepository medicalrecordRepository;
 
+    @Autowired
     public MedicalrecordService(MedicalrecordRepository medicalrecordRepository) {
         this.medicalrecordRepository = medicalrecordRepository;
     }

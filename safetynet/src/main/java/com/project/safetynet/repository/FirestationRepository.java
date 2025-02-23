@@ -12,7 +12,10 @@ import java.util.List;
 public interface FirestationRepository extends JpaRepository<Firestation, Long> {
     @Query("SELECT f.address FROM Firestation f WHERE f.station = :station")
     List<String> findAddressesByStationId(@Param("station") int station);
+
     @Query("SELECT f.station FROM Firestation f WHERE f.address = :address")
     List<Integer> findStationIdByAddress(@Param("address") String address);
-    @Query("SELECT f.address FROM Firestation f WHERE f.stationId IN :station")
-    List<String> findByStationIdIn(@Param("station") List<Integer> stationIds);}
+
+    @Query("SELECT f.address FROM Firestation f WHERE f.station IN :station")
+    List<String> findByStationIdIn(@Param("station") List<Integer> stationIds);
+}
