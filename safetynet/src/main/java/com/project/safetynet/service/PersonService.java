@@ -27,7 +27,6 @@ public class PersonService {
         this.medicalrecordService = medicalrecordService;
     }
 
-
     public List<Person> getAllPersons() {
         return personRepository.findAll();
     }

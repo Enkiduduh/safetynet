@@ -2,7 +2,6 @@ package com.project.safetynet.controller;
 
 import com.project.safetynet.model.*;
 import com.project.safetynet.service.FirestationService;
-import com.project.safetynet.service.PersonService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +15,6 @@ public class FirestationController {
     public FirestationController(FirestationService firestationService) {
         this.firestationService = firestationService;
     }
-
-    @GetMapping("/test")
-    public String testEndpoint() {
-        return "Test endpoint is working!";
-    }
-
 
     @GetMapping("/firestation")
     public List<PersonDTO> getPersonsByFirestation(@RequestParam int station) {
@@ -38,10 +31,10 @@ public class FirestationController {
         return firestationService.getAllInfoByStation(stationIds);
     }
 
-    @PostMapping
-    public Firestation addFirestation(@RequestBody Firestation firestation) {
-        System.out.println("firestation added");
-        return firestationService.addFirestation(firestation);
-
-    }
+//    @PostMapping
+//    public Firestation addFirestation(@RequestBody Firestation firestation) {
+//        System.out.println("firestation added");
+//        return firestationService.addFirestation(firestation);
+//
+//    }
 }

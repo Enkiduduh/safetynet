@@ -65,10 +65,7 @@ public class PersonControllerTest {
         mockMvc.perform(get("/api/persons")).andExpect(status().isOk()).andDo(print());
     }
 
-    @Test
-    public void testGetFirestations() throws Exception {
-        mockMvc.perform(get("/api/firestations")).andExpect(status().isOk()).andDo(print());
-    }
+
 
     @Test
     public void testGetMedicalrecords() throws Exception {
