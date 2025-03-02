@@ -19,7 +19,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        logger.info("Requête reçue : {} {}", request.getMethod(), request.getRequestURI());
+        logger.info("Request received : {} {}", request.getMethod(), request.getRequestURI());
         logRequestHeaders(request);
         logRequestBody(request);
         return true;
@@ -28,11 +28,11 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         if (ex != null) {
-            logger.error("Erreur détectée : {}", ex.getMessage(), ex);
+            logger.error("Error detected : {}", ex.getMessage(), ex);
         } else if (response.getStatus() >= HttpStatus.BAD_REQUEST.value()) {
-            logger.error("Réponse avec erreur : {} {}", response.getStatus(), response.getErrorMessage());
+            logger.error("Response with error : {} {}", response.getStatus(), response.getLocale());
         } else {
-            logger.info("Réponse réussie : {} {}", response.getStatus(), request.getRequestURI());
+            logger.info("Response successful : {} {}", response.getStatus(), request.getRequestURI());
         }
     }
 
@@ -53,9 +53,9 @@ public class LoggingInterceptor implements HandlerInterceptor {
             while ((line = reader.readLine()) != null) {
                 body.append(line);
             }
-            logger.debug("Corps de la requête : {}", body.toString());
+            logger.debug("Request body : {}", body.toString());
         } catch (IOException e) {
-            logger.warn("Impossible de lire le corps de la requête");
+            logger.warn("Impossible to read the body request");
         }
     }
 

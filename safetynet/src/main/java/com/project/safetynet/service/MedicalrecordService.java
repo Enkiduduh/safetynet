@@ -1,8 +1,12 @@
 package com.project.safetynet.service;
 
 import com.project.safetynet.model.Medicalrecord;
+import com.project.safetynet.model.Person;
 import com.project.safetynet.repository.MedicalrecordRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +22,21 @@ public class MedicalrecordService {
     @Autowired
     public MedicalrecordService(MedicalrecordRepository medicalrecordRepository) {
         this.medicalrecordRepository = medicalrecordRepository;
+    }
+
+    public List<Medicalrecord> getAllMedicalrecords() {
+        return medicalrecordRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteMedicalRecordByFirstNameAndLastName(String firstName, String lastName) {
+        Optional<Medicalrecord> optionalMedicalrecord = medicalrecordRepository.findByFirstNameAndLastName(firstName, lastName);
+        if (optionalMedicalrecord.isEmpty()) {
+            System.out.println("Dossier medical non trouvé avec le nom : " + firstName + " " + lastName);
+        }  else {
+            System.out.println("Dossier medical supprimé pour le nom : " + firstName + " " + lastName);
+            medicalrecordRepository.deleteAll(optionalMedicalrecord);
+        }
     }
 
     public int calculAge(String firstName, String lastName, MedicalrecordRepository medicalrecordRepository) {

@@ -23,6 +23,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     List<Person> findByLastName(String lastName);
 
     List<Person> findByFirstNameAndLastName(String firstName, String lastName);
+
     @Transactional
-    void deleteByFirstNameAndLastName(String firstName, String lastName);
+    void deletePersonByFirstNameAndLastName(String firstName, String lastName);
 }

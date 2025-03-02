@@ -61,7 +61,7 @@ public class PersonService {
     }
 
     @Transactional
-    public void deleteByFirstNameAndLastName(String firstName, String lastName) {
+    public void deletePersonByFirstNameAndLastName(String firstName, String lastName) {
         List<Person> persons = personRepository.findByFirstNameAndLastName(firstName, lastName);
 
         if (persons.isEmpty()) {

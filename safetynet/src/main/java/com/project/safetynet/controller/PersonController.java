@@ -65,7 +65,7 @@ public class PersonController {
         if (persons.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Personne non trouvée avec le nom : " + firstName + " " + lastName);
         }
-        personService.deleteByFirstNameAndLastName(firstName, lastName);
+        personService.deletePersonByFirstNameAndLastName(firstName, lastName);
         return ResponseEntity.ok("Personne supprimée avec succès : " + firstName + " " + lastName);
     }
 }

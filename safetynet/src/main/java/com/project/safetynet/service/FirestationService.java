@@ -33,6 +33,9 @@ public class FirestationService {
         return firestationRepository.save(firestation);
     }
 
+    public List<Firestation> getAllFirestations() {
+        return firestationRepository.findAll();
+    }
 
     public List<PersonDTO> getPersonsByFirestation(int station) {
         System.out.println("Recherche des adresses pour la station: " + station);

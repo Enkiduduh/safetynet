@@ -18,20 +18,4 @@ public class DataController {
         this.dataLoaderService = dataLoaderService;
     }
 
-//    @GetMapping("/persons")
-//    public List<Person> getPersons() {
-//        return dataLoaderService.getPersons();
-//    }
-
-//    @GetMapping("/firestations")
-//    public List<Firestation> getFirestations() {
-//        return dataLoaderService.getFirestations();
-//    }
-//
-//    @GetMapping("/medicalrecords")
-//    public List<Medicalrecord> getMedicalrecords(){
-//        return dataLoaderService.getMedicalrecords();
-//    }
-
-
 }

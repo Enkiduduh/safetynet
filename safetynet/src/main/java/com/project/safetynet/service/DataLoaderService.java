@@ -57,21 +57,21 @@ public class DataLoaderService {
             try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data.json")) {
 
                 if (inputStream == null) {
-                    throw new RuntimeException("❌ Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
+                    throw new RuntimeException("Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
                 }
                 DataWrapper data = objectMapper.readValue(inputStream, DataWrapper.class);
 //                this.persons = data.getPersons();  // Chargement des données
 //                this.firestations = data.getFirestations();
 //                this.medicalrecords = data.getMedicalrecords();
-                System.out.println("✅ Données chargées avec succès !");
+                System.out.println("Données chargées avec succès !");
 
                 personRepository.saveAll(data.getPersons()); // Sauvegarde dans la base de données
                 firestationRepository.saveAll(data.getFirestations());
                 medicalrecordRepository.saveAll(data.getMedicalrecords());
-                System.out.println("✅ Données sauvegardées en BDD avec succès !");
+                System.out.println("Données sauvegardées en BDD avec succès !");
 
             } catch (IOException e) {
-                throw new RuntimeException("❌ Erreur de lecture du fichier JSON : " + e.getMessage(), e);
+                throw new RuntimeException("Erreur de lecture du fichier JSON : " + e.getMessage(), e);
             }
         }
     }

@@ -1,7 +1,9 @@
 package com.project.safetynet.controller;
 
 import com.project.safetynet.model.*;
+import com.project.safetynet.service.DataLoaderService;
 import com.project.safetynet.service.FirestationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,8 +14,16 @@ import java.util.Map;
 public class FirestationController {
     private final FirestationService firestationService;
 
+    @Autowired
+    private DataLoaderService dataLoaderService;
+
     public FirestationController(FirestationService firestationService) {
         this.firestationService = firestationService;
+    }
+
+    @GetMapping("/firestations")
+    public List<Firestation> getAllFirestations() {
+        return dataLoaderService.getFirestations();
     }
 
     @GetMapping("/firestation")
