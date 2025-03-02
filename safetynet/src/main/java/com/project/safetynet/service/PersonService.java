@@ -4,6 +4,7 @@ import com.project.safetynet.model.*;
 import com.project.safetynet.repository.FirestationRepository;
 import com.project.safetynet.repository.MedicalrecordRepository;
 import com.project.safetynet.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,42 @@ public class PersonService {
 
     public Person savePerson(Person person) {
         return personRepository.save(person);
+    }
+
+    public boolean verifyPersonBeforeSaving(Person person) {
+        if (person.getFirstName() == null || person.getFirstName().isBlank() ||
+                person.getLastName() == null || person.getLastName().isBlank() ||
+                person.getAddress() == null || person.getAddress().isBlank() ||
+                person.getPhone() == null || !person.getPhone().matches("^\\d{10}$") ||
+                person.getEmail() == null || !person.getEmail().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+
+            System.out.println("Échec de la validation : Informations manquantes ou invalides.");
+            return false;
+        }
+
+        // Vérifie si la personne existe déjà en base
+        List<Person> existingPersons = personRepository.findByFirstNameAndLastName(person.getFirstName(), person.getLastName());
+        if (!existingPersons.isEmpty()) {
+            System.out.println("Échec de la validation : Cette personne existe déjà en base.");
+            return false;
+        }
+        return true;
+    }
+
+    public List<Person> getPersonByFullName(String firstName, String lastName) {
+        return personRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @Transactional
+    public void deleteByFirstNameAndLastName(String firstName, String lastName) {
+        List<Person> persons = personRepository.findByFirstNameAndLastName(firstName, lastName);
+
+        if (persons.isEmpty()) {
+            System.out.println("Aucune personne trouvée à supprimer.");
+        } else {
+            System.out.println("Suppression des personnes : " + persons);
+            personRepository.deleteAll(persons);
+        }
     }
 
     public List<PersonEmailDTO> getAllPersonsEmail(String city) {
@@ -113,13 +150,15 @@ public class PersonService {
         List<Integer> firestationIds = firestationRepository.findStationIdByAddress(address);
         Integer firestationId = firestationIds.stream()
                 .distinct() // Supprime les doublons
-                .reduce((a, b) -> { throw new IllegalStateException("Plusieurs stationId trouvés !"); })
+                .reduce((a, b) -> {
+                    throw new IllegalStateException("Plusieurs stationId trouvés !");
+                })
                 .orElse(null);
         System.out.println("StationId:" + firestationId);
 
         if (personsAtAddress.isEmpty()) {
             System.out.println("Aucun habitant à l'adresse:");
-            return new CompleteFireDTO(new ArrayList<>(),firestationId);
+            return new CompleteFireDTO(new ArrayList<>(), firestationId);
         }
 
         List<PersonFireDTO> persons = personsAtAddress.stream()
@@ -133,7 +172,7 @@ public class PersonService {
                 ))
                 .toList();
 
-        return new CompleteFireDTO(persons,firestationId);
+        return new CompleteFireDTO(persons, firestationId);
     }
 
 

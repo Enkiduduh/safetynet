@@ -39,39 +39,41 @@ public class DataLoaderService {
     private List<Medicalrecord> medicalrecords;
 
     public List<Person> getPersons() {
-        return persons;
+        return personRepository.findAll();
     }
 
     public List<Firestation> getFirestations() {
-        return firestations;
+        return firestationRepository.findAll();
     }
 
     public List<Medicalrecord> getMedicalrecords() {
-        return medicalrecords;
+        return medicalrecordRepository.findAll();
     }
 
     @PostConstruct
     public void init() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data.json")) {
-            if (inputStream == null) {
-                throw new RuntimeException("❌ Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
+        if (personRepository.count() == 0 && firestationRepository.count() == 0 && medicalrecordRepository.count() == 0) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data.json")) {
+
+                if (inputStream == null) {
+                    throw new RuntimeException("❌ Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
+                }
+                DataWrapper data = objectMapper.readValue(inputStream, DataWrapper.class);
+//                this.persons = data.getPersons();  // Chargement des données
+//                this.firestations = data.getFirestations();
+//                this.medicalrecords = data.getMedicalrecords();
+                System.out.println("✅ Données chargées avec succès !");
+
+                personRepository.saveAll(data.getPersons()); // Sauvegarde dans la base de données
+                firestationRepository.saveAll(data.getFirestations());
+                medicalrecordRepository.saveAll(data.getMedicalrecords());
+                System.out.println("✅ Données sauvegardées en BDD avec succès !");
+
+            } catch (IOException e) {
+                throw new RuntimeException("❌ Erreur de lecture du fichier JSON : " + e.getMessage(), e);
             }
-            DataWrapper data = objectMapper.readValue(inputStream, DataWrapper.class);
-            this.persons = data.getPersons();  // Chargement des données
-            this.firestations = data.getFirestations();
-            this.medicalrecords = data.getMedicalrecords();
-            System.out.println("✅ Données chargées avec succès !");
-
-            personRepository.saveAll(persons); // Sauvegarde dans la base de données
-            firestationRepository.saveAll(firestations);
-            medicalrecordRepository.saveAll(medicalrecords);
-            System.out.println("✅ Données sauvegardées en BDD avec succès !");
-
-        } catch (IOException e) {
-            throw new RuntimeException("❌ Erreur de lecture du fichier JSON : " + e.getMessage(), e);
         }
     }
-
 
 }
