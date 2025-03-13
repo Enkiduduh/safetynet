@@ -12,68 +12,94 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class DataLoaderService {
 
-    private final FirestationRepository firestationRepository;
-    private final PersonRepository personRepository;
-    private final MedicalrecordRepository medicalrecordRepository;
-
-
-    @Autowired
-    public DataLoaderService(FirestationRepository firestationRepository,
-                             PersonRepository personRepository,
-                             MedicalrecordRepository medicalRecordRepository) {
-        this.firestationRepository = firestationRepository;
-        this.personRepository = personRepository;
-        this.medicalrecordRepository = medicalRecordRepository;
-    }
-
     private List<Person> persons;
     private List<Firestation> firestations;
     private List<Medicalrecord> medicalrecords;
 
-    public List<Person> getPersons() {
-        return personRepository.findAll();
+    public List<Firestation> getFirestations() {
+        return firestations;
     }
 
-    public List<Firestation> getFirestations() {
-        return firestationRepository.findAll();
+    public List<Person> getPersons() {
+        return persons;
+    }
+
+    public void addFirestation(Firestation firestation) {
+        firestations.add(firestation);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File("data.json"), firestations);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteFirestations(String address, Integer station) {
+        firestations.removeIf(p -> p.getAddress().equals(address) && Objects.equals(p.getStation(), station));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File("data.json"), firestations);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+        }
     }
 
     public List<Medicalrecord> getMedicalrecords() {
-        return medicalrecordRepository.findAll();
+        return medicalrecords;
+    }
+
+    public void addMedicalrecord(Medicalrecord medicalrecord) {
+        medicalrecords.add(medicalrecord);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File("data.json"), medicalrecords);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+        }
+    }
+
+    public void deleteMedicalrecord(String firstName, String lastName) {
+        medicalrecords.removeIf(p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            objectMapper.writeValue(new File("data.json"), medicalrecords);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+        }
     }
 
     @PostConstruct
     public void init() {
-        if (personRepository.count() == 0 && firestationRepository.count() == 0 && medicalrecordRepository.count() == 0) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data.json")) {
-
-                if (inputStream == null) {
-                    throw new RuntimeException("Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
-                }
-                DataWrapper data = objectMapper.readValue(inputStream, DataWrapper.class);
-//                this.persons = data.getPersons();  // Chargement des données
-//                this.firestations = data.getFirestations();
-//                this.medicalrecords = data.getMedicalrecords();
-                System.out.println("Données chargées avec succès !");
-
-                personRepository.saveAll(data.getPersons()); // Sauvegarde dans la base de données
-                firestationRepository.saveAll(data.getFirestations());
-                medicalrecordRepository.saveAll(data.getMedicalrecords());
-                System.out.println("Données sauvegardées en BDD avec succès !");
-
-            } catch (IOException e) {
-                throw new RuntimeException("Erreur de lecture du fichier JSON : " + e.getMessage(), e);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("data.json")) {
+            if (inputStream == null) {
+                throw new RuntimeException("Fichier data.json introuvable ! Vérifiez qu'il est bien placé dans `resources/`.");
             }
+            DataWrapper data = objectMapper.readValue(inputStream, DataWrapper.class);
+            System.out.println("Data loaded: " + data.getPersons().size() + " persons");
+            this.persons = data.getPersons();  // Chargement des données
+            this.firestations = data.getFirestations();
+            this.medicalrecords = data.getMedicalrecords();
+            System.out.println("Données chargées avec succès !");
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de lecture du fichier JSON : " + e.getMessage(), e);
         }
     }
+
 
 }

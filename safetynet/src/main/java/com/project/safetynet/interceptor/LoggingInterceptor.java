@@ -7,9 +7,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 
 @Component
@@ -18,7 +20,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws UnsupportedEncodingException {
         logger.info("Request received : {} {}", request.getMethod(), request.getRequestURI());
         logRequestHeaders(request);
         logRequestBody(request);
@@ -46,16 +48,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
     }
 
-    private void logRequestBody(HttpServletRequest request) {
-        try (BufferedReader reader = request.getReader()) {
-            StringBuilder body = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                body.append(line);
+    private void logRequestBody(HttpServletRequest request) throws UnsupportedEncodingException {
+        if (request instanceof ContentCachingRequestWrapper wrapper) {
+            byte[] buf = wrapper.getContentAsByteArray();
+            if (buf.length > 0) {
+                String body = new String(buf, wrapper.getCharacterEncoding());
+                logger.debug("Request body : {}", body);
             }
-            logger.debug("Request body : {}", body.toString());
-        } catch (IOException e) {
-            logger.warn("Impossible to read the body request");
+        } else {
+            logger.warn("Request is not wrapped with ContentCachingRequestWrapper, cannot log body.");
         }
     }
 

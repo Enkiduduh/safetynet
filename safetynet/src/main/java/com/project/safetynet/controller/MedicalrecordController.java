@@ -36,13 +36,13 @@ public class MedicalrecordController {
         return dataLoaderService.getMedicalrecords();
     }
 
-    @DeleteMapping("/medicalrecord")
-    public ResponseEntity<String> deleteMedicalrecord(@RequestParam String firstName, @RequestParam String lastName) {
-        Optional<Medicalrecord> optionalMedicalrecord = medicalrecordRepository.findByFirstNameAndLastName(firstName, lastName);
-        if (optionalMedicalrecord.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Dossier medical non trouvé avec le nom : " + firstName + " " + lastName);
-        }
-        medicalrecordService.deleteMedicalRecordByFirstNameAndLastName(firstName, lastName);
-        return ResponseEntity.ok("Dossier medical supprimé avec succès pour: " + firstName + " " + lastName);
-    }
+//    @DeleteMapping("/medicalrecord")
+//    public ResponseEntity<String> deleteMedicalrecord(@RequestParam String firstName, @RequestParam String lastName) {
+//        Optional<Medicalrecord> optionalMedicalrecord = medicalrecordRepository.findByFirstNameAndLastName(firstName, lastName);
+//        if (optionalMedicalrecord.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Dossier medical non trouvé avec le nom : " + firstName + " " + lastName);
+//        }
+//        medicalrecordService.deleteMedicalRecordByFirstNameAndLastName(firstName, lastName);
+//        return ResponseEntity.ok("Dossier medical supprimé avec succès pour: " + firstName + " " + lastName);
+//    }
 }

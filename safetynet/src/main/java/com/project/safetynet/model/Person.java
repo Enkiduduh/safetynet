@@ -13,7 +13,6 @@ import lombok.*;
 public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrémentation
-    private Long id;
     private String firstName;
     private String lastName;
     private String address;

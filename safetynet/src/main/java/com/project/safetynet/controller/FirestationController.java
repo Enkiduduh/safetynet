@@ -26,6 +26,18 @@ public class FirestationController {
         return dataLoaderService.getFirestations();
     }
 
+    @PostMapping("/firestation")
+    public String addFirestation(@RequestBody Firestation firestation) {
+        dataLoaderService.addFirestation(firestation);
+        return "Firestation ajoutée avec succès.";
+    }
+
+    @DeleteMapping("/firestation")
+    public String deletePerson(@RequestParam String address, @RequestParam Integer station) {
+        dataLoaderService.deleteFirestations(address, Integer.valueOf(String.valueOf(station)));
+        return "Personne supprimée avec succès : " + address + " " + station;
+    }
+
     @GetMapping("/firestation")
     public List<PersonDTO> getPersonsByFirestation(@RequestParam int station) {
         return firestationService.getPersonsByFirestation(station);
@@ -41,10 +53,5 @@ public class FirestationController {
         return firestationService.getAllInfoByStation(stationIds);
     }
 
-//    @PostMapping
-//    public Firestation addFirestation(@RequestBody Firestation firestation) {
-//        System.out.println("firestation added");
-//        return firestationService.addFirestation(firestation);
-//
-//    }
+
 }

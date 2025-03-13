@@ -1,5 +1,6 @@
 package com.project.safetynet.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.safetynet.model.*;
 import com.project.safetynet.repository.FirestationRepository;
 import com.project.safetynet.repository.MedicalrecordRepository;
@@ -7,22 +8,24 @@ import com.project.safetynet.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class FirestationService {
 
+    private List<Firestation> firestations;
+    private final DataLoaderService dataLoaderService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final FirestationRepository firestationRepository;
     private final PersonRepository personRepository;
     private final MedicalrecordRepository medicalrecordRepository;
     private final MedicalrecordService medicalrecordService;
 
     @Autowired
-    public FirestationService(FirestationRepository firestationRepository, PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, MedicalrecordService medicalrecordService) {
+    public FirestationService(DataLoaderService dataLoaderService, FirestationRepository firestationRepository, PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, MedicalrecordService medicalrecordService) {
+        this.dataLoaderService = dataLoaderService;
+        this.firestations = new ArrayList<>();
         this.firestationRepository = firestationRepository;
         this.personRepository = personRepository;
         this.medicalrecordRepository = medicalrecordRepository;
@@ -93,9 +96,9 @@ public class FirestationService {
                     person.getFirstName(),
                     person.getLastName(),
                     person.getPhone(),
-                    medicalrecordService.calculAge(person.getFirstName(), person.getLastName(), medicalrecordRepository),
-                    medicalrecordService.recoverMedications(person.getFirstName(), person.getLastName(), medicalrecordRepository),
-                    medicalrecordService.recoverAllergies(person.getFirstName(), person.getLastName(), medicalrecordRepository)
+                    medicalrecordService.calculAge(person),
+                    medicalrecordService.recoverMedications(person),
+                    medicalrecordService.recoverAllergies(person)
             );
 
             // Ajouter le DTO à la bonne adresse dans la map
@@ -103,4 +106,7 @@ public class FirestationService {
         }
         return result;
     }
+
+
+
 }
