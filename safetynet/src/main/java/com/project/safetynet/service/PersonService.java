@@ -13,13 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +26,6 @@ public class PersonService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MedicalrecordService medicalrecordService;
     private final PersonRepository personRepository;
-    private final FirestationRepository firestationRepository;
-
 
     @Autowired
     public PersonService(DataLoaderService dataLoaderService, PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, FirestationRepository firestationRepository, MedicalrecordService medicalrecordService) {
@@ -38,18 +33,12 @@ public class PersonService {
         this.medicalrecordService = medicalrecordService;
         this.persons = new ArrayList<>(); // Évite NullPointerException
         this.personRepository = personRepository;
-        this.firestationRepository = firestationRepository;
     }
-
 
     @PostConstruct
     public void init() {
         this.persons = new ArrayList<>(dataLoaderService.getPersons()); // Charge les données au démarrage
         System.out.println("Person list initialized with " + persons.size() + " persons.");
-    }
-
-    public Person savePerson(Person person) {
-        return personRepository.save(person);
     }
 
     public List<Person> getPersons() {
@@ -133,18 +122,6 @@ public class PersonService {
         return personRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 
-    @Transactional
-    public void deletePersonByFirstNameAndLastName(String firstName, String lastName) {
-        List<Person> persons = personRepository.findByFirstNameAndLastName(firstName, lastName);
-
-        if (persons.isEmpty()) {
-            System.out.println("Aucune personne trouvée à supprimer.");
-        } else {
-            System.out.println("Suppression des personnes : " + persons);
-            personRepository.deleteAll(persons);
-        }
-    }
-
     public List<String> getAllPersonsEmail(String city) {
         System.out.println("Recherche des emails des habitants de: " + city);
         // Trouver les emails des habitants associés à cette ville
@@ -158,13 +135,6 @@ public class PersonService {
             System.out.println("Aucun emails trouvés pour cette ville.");
             return new ArrayList<>();
         }
-//        List<Person> persons = personRepository.findByEmailIn(emails);
-//        System.out.println("Emails trouvés: " + emails.size());
-
-//        return persons.stream()
-//                .map(person -> new PersonEmailDTO(person.getEmail()))
-//                .collect(Collectors.toList());
-//        List<PersonEmailDTO>
         return emails;
     }
 
@@ -209,10 +179,11 @@ public class PersonService {
 
     public List<PersonInfoDTO> getAllPersonsWithName(String lastName) {
         System.out.println("Recherche des personnes avec le nom:" + lastName);
+
         // Récupérer toutes les personnes ayant ce nom
         List<Person> personsWithName = dataLoaderService.getPersons().stream()
                 .filter(person -> person.getLastName().equalsIgnoreCase(lastName))
-                .collect(Collectors.toList());
+                .toList();
 
         List<PersonInfoDTO> results = personsWithName.stream()
                 .map(person -> new PersonInfoDTO(
@@ -229,39 +200,57 @@ public class PersonService {
     }
 
     public CompleteFireDTO getAllPersonsInfosByAddressFire(String address) {
-        System.out.println("Recherche des habitants à l'adresse:" + address);
+        System.out.println("Recherche des habitants à l'adresse : " + address);
+
+        // Vérifier les adresses existantes
+        dataLoaderService.getPersons().forEach(person -> System.out.println("Adresse trouvée : " + person.getAddress()));
+
         // Récupérer toutes les personnes vivant à cette adresse
         List<Person> personsAtAddress = dataLoaderService.getPersons().stream()
-                .filter(person -> person.getAddress().equalsIgnoreCase(address))
+                .filter(person -> person.getAddress() != null && person.getAddress().equalsIgnoreCase(address))
                 .toList();
+
+        System.out.println("Personnes trouvées : " + personsAtAddress.size());
 
         List<Integer> firestationIds = dataLoaderService.getFirestations().stream()
-                .filter(firestation -> firestation.getAddress().equalsIgnoreCase(address))
-                .map(firestation -> firestation.getId().intValue()) // Conversion Long -> Integer
-                .toList();
+                .filter(firestation -> firestation.getAddress() != null && firestation.getAddress().equalsIgnoreCase(address))
+                .map(Firestation::getStation)
+                .collect(Collectors.toList());
 
         Integer firestationId = firestationIds.stream()
-                .distinct() // Supprime les doublons
+                .distinct()
                 .reduce((a, b) -> {
                     throw new IllegalStateException("Plusieurs stationId trouvés !");
                 })
                 .orElse(null);
-        System.out.println("StationId:" + firestationId);
+
+        // Ajoute une vérification pour éviter une erreur si aucune station n'est trouvée
+        if (firestationId == null) {
+            System.out.println("Aucune station de pompiers trouvée pour cette adresse !");
+        }
+
+        System.out.println("Station ID (avant validation) : " + firestationId);
 
         if (personsAtAddress.isEmpty()) {
-            System.out.println("Aucun habitant à l'adresse:");
+            System.out.println("Aucun habitant à l'adresse : " + address);
             return new CompleteFireDTO(new ArrayList<>(), firestationId);
         }
 
         List<PersonFireDTO> persons = personsAtAddress.stream()
-                .map(person -> new PersonFireDTO(
-                        person.getFirstName(),
-                        person.getLastName(),
-                        person.getPhone(),
-                        medicalrecordService.calculAge(person),
-                        medicalrecordService.recoverMedications(person),
-                        medicalrecordService.recoverAllergies(person)
-                ))
+                .map(person -> {
+                    int age = medicalrecordService != null ? medicalrecordService.calculAge(person) : -1;
+                    List<String> medications = medicalrecordService != null ? medicalrecordService.recoverMedications(person) : new ArrayList<>();
+                    List<String> allergies = medicalrecordService != null ? medicalrecordService.recoverAllergies(person) : new ArrayList<>();
+
+                    return new PersonFireDTO(
+                            person.getFirstName(),
+                            person.getLastName(),
+                            person.getPhone(),
+                            age,
+                            medications,
+                            allergies
+                    );
+                })
                 .toList();
 
         return new CompleteFireDTO(persons, firestationId);

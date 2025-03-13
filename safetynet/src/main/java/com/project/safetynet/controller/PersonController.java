@@ -40,10 +40,17 @@ public class PersonController {
 
     @GetMapping("/fire")
     public CompleteFireDTO getAllPersonsInfosByAddressFire(@RequestParam String address) {
-        return personService.getAllPersonsInfosByAddressFire(address);
+//        return personService.getAllPersonsInfosByAddressFire(address);
+        try {
+            return personService.getAllPersonsInfosByAddressFire(address);
+        } catch (Exception e) {
+            System.err.println("Erreur lors du traitement : " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
-    @GetMapping("/personInfolastName")
+    @GetMapping("/personInfoLastName")
     public List<PersonInfoDTO> getAllPersonsWithName(@RequestParam String lastName) {
         return personService.getAllPersonsWithName(lastName);
     }

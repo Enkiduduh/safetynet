@@ -19,13 +19,11 @@ import java.util.Optional;
 public class MedicalrecordService {
     private final DataLoaderService dataLoaderService;
     private final MedicalrecordRepository medicalrecordRepository;
-    private final PersonService personService;
 
     @Autowired
-    public MedicalrecordService(DataLoaderService dataLoaderService, MedicalrecordRepository medicalrecordRepository, PersonService personService) {
+    public MedicalrecordService(DataLoaderService dataLoaderService, MedicalrecordRepository medicalrecordRepository) {
         this.dataLoaderService = dataLoaderService;
         this.medicalrecordRepository = medicalrecordRepository;
-        this.personService = personService;
     }
 
     public List<Medicalrecord> getAllMedicalrecords() {

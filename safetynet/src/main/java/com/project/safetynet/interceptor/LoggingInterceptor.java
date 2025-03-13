@@ -48,12 +48,16 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
     }
 
-    private void logRequestBody(HttpServletRequest request) throws UnsupportedEncodingException {
+    private void logRequestBody(HttpServletRequest request) {
         if (request instanceof ContentCachingRequestWrapper wrapper) {
             byte[] buf = wrapper.getContentAsByteArray();
             if (buf.length > 0) {
-                String body = new String(buf, wrapper.getCharacterEncoding());
-                logger.debug("Request body : {}", body);
+                try {
+                    String body = new String(buf, wrapper.getCharacterEncoding());
+                    logger.debug("Request body : {}", body);
+                } catch (UnsupportedEncodingException e) {
+                    logger.warn("Unsupported encoding while reading request body.");
+                }
             }
         } else {
             logger.warn("Request is not wrapped with ContentCachingRequestWrapper, cannot log body.");

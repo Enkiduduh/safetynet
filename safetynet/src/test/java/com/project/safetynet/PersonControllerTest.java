@@ -45,15 +45,6 @@ public class PersonControllerTest {
     @Mock
     private FirestationService firestationService;
 
-    @Mock
-    private PersonRepository personRepository;
-
-    @Mock
-    private FirestationRepository firestationRepository;
-
-    @Mock
-    private MedicalrecordRepository medicalrecordRepository;
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
@@ -139,16 +130,16 @@ public class PersonControllerTest {
         );
 
         // Mock du service
-        when(personService.savePerson(person)).thenReturn(person);
-        when(personService.savePerson(person2)).thenReturn(person2);
+        doNothing().when(personService).addPerson(person);
+        doNothing().when(personService).addPerson(person2);
         when(personService.getAllPersonsWithName("Soumar")).thenReturn(List.of(personInfoDTO, personInfoDTO2));
         // Exécution
-        personService.savePerson(person);
-        personService.savePerson(person2);
+        personService.addPerson(person);
+        personService.addPerson(person2);
         List<PersonInfoDTO> retrievedPersons = personService.getAllPersonsWithName("Soumar");
         // Vérifications
-        verify(personService, times(1)).savePerson(person);
-        verify(personService, times(1)).savePerson(person2);
+        verify(personService, times(1)).addPerson(person);
+        verify(personService, times(1)).addPerson(person2);
         verify(personService, times(1)).getAllPersonsWithName("Soumar");
 
         // Vérifications des résultats
