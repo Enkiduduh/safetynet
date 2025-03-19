@@ -1,7 +1,10 @@
 package com.project.safetynet;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.safetynet.controller.FirestationController;
 import com.project.safetynet.model.*;
+import com.project.safetynet.service.DataLoaderService;
 import com.project.safetynet.service.FirestationService;
 import com.project.safetynet.service.PersonService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +17,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,11 +38,14 @@ public class FirestationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
+    @Mock
     private FirestationController firestationController;
 
-    @Mock
+    @InjectMocks
     private FirestationService firestationService;
+
+    @Mock
+    private DataLoaderService dataLoaderService;
 
     @Mock
     private PersonService personService;
@@ -50,103 +59,68 @@ public class FirestationControllerTest {
     }
 
     @Test
-    public void testGetFirestations() throws Exception {
+    public void testGetAllFirestations() throws Exception {
         mockMvc.perform(get("/api/firestations")).andExpect(status().isOk()).andDo(print());
     }
 
     @Test
-    public void testGetPhoneFromPersonByFirestation() {
-        // Création d'une persone
-        Person person = new Person();
-        person.setFirstName("Ilyes");
-        person.setLastName("Soumar");
-        person.setAddress("947 E. Rose Dr");
-        person.setCity("Culver");
-        person.setZip("97451");
-        person.setPhone("841-874-0000");
-        person.setEmail("ilyes.soumar@test.fr");
-
-
-        // Création d'une persone
-        Person person2 = new Person();
-        person2.setFirstName("Jack");
-        person2.setLastName("Jones");
-        person2.setAddress("947 E. Rose Dr");
-        person2.setCity("Culver");
-        person2.setZip("97451");
-        person2.setPhone("841-874-7784");
-        person2.setEmail("jack.jones@test.fr");
-
-        // Création de l'objet DTO attendu
-        PersonPhoneDTO testPersonPhoneDTO = new PersonPhoneDTO(
-                person.getPhone()
-        );
-
-        PersonPhoneDTO testPersonPhoneDTO2 = new PersonPhoneDTO(
-                person2.getPhone()
-        );
-
-        // Mock du service
-        when(firestationService.getPhoneFromPersonByFirestation(1)).thenReturn(List.of(testPersonPhoneDTO,testPersonPhoneDTO2));
-
-        // Exécution
-        List<PersonPhoneDTO> retrievedPhoneList = firestationService.getPhoneFromPersonByFirestation(1);
-
-        // Vérifications
-        verify(firestationService, times(1)).getPhoneFromPersonByFirestation(1);
-
-        // Vérifications des résultats
-        assertNotNull(testPersonPhoneDTO);
-        assertEquals("841-874-0000", testPersonPhoneDTO.getPhone());
-
-        assertNotNull(retrievedPhoneList);
-        assertTrue(retrievedPhoneList.size() > 1);
-        assertEquals("841-874-7784", retrievedPhoneList.get(1).getPhone());
+    public void testGetPersonsByFirestation() throws Exception {
+        mockMvc.perform(get("/api/firestation").param("station", "1")).andExpect(status().isOk()).andDo(print());
     }
 
-    //@Test
-//    public void testAddFirestation() {
-//        String address = "1502 Fire St";
-//        int stationNumber = 5;
-//
-//        // Création d'une persone
-//        Person person = new Person();
-//        person.setFirstName("Ilyes");
-//        person.setLastName("Soumar");
-//        person.setAddress("1502 Fire St");
-//        person.setCity("Paris");
-//        person.setZip("94000");
-//        person.setPhone("0658895313");
-//        person.setEmail("ilyes.soumar@test.fr");
-//
-//        // Création de l'objet DTO attendu
-//        PersonDTO personDTO = new PersonDTO(
-//                person.getFirstName(),
-//                person.getLastName(),
-//                person.getAddress(),
-//                person.getPhone()
-//        );
-//        // Creation d'une firestation
-//        Firestation firestation = new Firestation();
-//        firestation.setAddress(address);
-//        firestation.setId(stationNumber);
-//
-//        // Mock du service
-//        when(firestationService.addFirestation(firestation)).thenReturn(firestation);
-//        when(personService.savePerson(person)).thenReturn(person);
-//        when(firestationService.getPersonsByFirestation(5)).thenReturn(List.of(personDTO));
-//        // Execution
-//        firestationService.addFirestation(firestation);
-//        personService.savePerson(person);
-//        List<PersonDTO> retrievePersonDto = firestationService.getPersonsByFirestation(5);
-//        // Vérifications
-//        verify(personService, times(1)).savePerson(person);
-//        verify(firestationService, times(1)).getPersonsByFirestation(5);
-//
-//        // Vérifications des résultats
-//        assertEquals(1, retrievePersonDto.size());
-//        assertEquals("1502 Fire St", retrievePersonDto.get(0).getAddress());
-//        assertEquals("Soumar", retrievePersonDto.get(0).getLastName());
-//
-//    }
+    @Test
+    public void testGetPhoneFromPersonByFirestation() throws Exception {
+        mockMvc.perform(get("/api/phoneAlert").param("firestation", "1")).andExpect(status().isOk()).andDo(print());
+    }
+
+    @Test
+    public void testGetAllInfoByStation() throws Exception {
+        mockMvc.perform(get("/api/flood/stations").param("stationIds", "1,2"))
+                .andExpect(status().isOk()).andDo(print());
+    }
+
+    @Test
+    public void testGetPhoneFromPersonByFirestationWithData() throws Exception {
+        mockMvc.perform(get("/api/phoneAlert").param("firestation", "1")) //
+                .andExpect(status().isOk()) //
+                .andExpect(jsonPath("$.length()").value(6))
+                .andExpect(jsonPath("$[0].phone").value("841-874-6512"))
+                .andExpect(jsonPath("$[1].phone").value("841-874-8547"))
+                .andExpect(jsonPath("$[2].phone").value("841-874-7462"));
+    }
+
+    @Test
+    public void testAddFirestation() throws Exception {
+        String firestationJson = """
+                {
+                   "address": "1 rue Springboot",
+                   "station": "1"
+                }
+                """;
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/firestation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(firestationJson))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void testDeleteFirestation() throws Exception {
+        String address = "1 rue Camembert";
+        int station = 1;
+
+        mockMvc.perform(delete("/api/firestation")
+                        .param("address", address)
+                        .param("station", String.valueOf(station)))
+                .andExpect(status().isOk()) //
+                .andDo(print());
+    }
+
+
+
+
+
 }
+
+

@@ -3,9 +3,6 @@ package com.project.safetynet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.safetynet.model.*;
-import com.project.safetynet.repository.FirestationRepository;
-import com.project.safetynet.repository.MedicalrecordRepository;
-import com.project.safetynet.repository.PersonRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +30,12 @@ public class FirestationService {
     public void init() {
         this.firestations = new ArrayList<>(dataLoaderService.getFirestations()); // Charge les données au démarrage
         System.out.println("Person list initialized with " + firestations.size() + " persons.");
+    }
+
+    public List<Firestation> getFirestations() {
+        List<Firestation> firestations = dataLoaderService.getFirestations();
+        System.out.println("Firestation list size: " + (firestations != null ? firestations.size() : "null"));
+        return firestations;
     }
 
     public void addFirestation(Firestation firestation) {

@@ -35,7 +35,7 @@ public class FirestationController {
     @DeleteMapping("/firestation")
     public String deletePerson(@RequestParam String address, @RequestParam Integer station) {
         dataLoaderService.deleteFirestations(address, Integer.valueOf(String.valueOf(station)));
-        return "Personne supprimée avec succès : " + address + " " + station;
+        return "Firestation supprimée avec succès : " + address + " " + station;
     }
 
     @GetMapping("/firestation")

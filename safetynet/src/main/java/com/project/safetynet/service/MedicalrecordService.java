@@ -2,46 +2,32 @@ package com.project.safetynet.service;
 
 import com.project.safetynet.model.Medicalrecord;
 import com.project.safetynet.model.Person;
-import com.project.safetynet.repository.MedicalrecordRepository;
-import jakarta.transaction.Transactional;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class MedicalrecordService {
     private final DataLoaderService dataLoaderService;
-    private final MedicalrecordRepository medicalrecordRepository;
+    private List<Medicalrecord> medicalrecords;
 
     @Autowired
-    public MedicalrecordService(DataLoaderService dataLoaderService, MedicalrecordRepository medicalrecordRepository) {
+    public MedicalrecordService(DataLoaderService dataLoaderService) {
         this.dataLoaderService = dataLoaderService;
-        this.medicalrecordRepository = medicalrecordRepository;
     }
 
-    public List<Medicalrecord> getAllMedicalrecords() {
-        return medicalrecordRepository.findAll();
+    @PostConstruct
+    public void init() {
+        this.medicalrecords = new ArrayList<>(dataLoaderService.getMedicalrecords()); // Charge les données au démarrage
+        System.out.println("Medicalrecord list initialized with " + medicalrecords.size() + " medicalrecords.");
     }
-
-//    @Transactional
-//    public void deleteMedicalRecordByFirstNameAndLastName(String firstName, String lastName) {
-//        Optional<Medicalrecord> optionalMedicalrecord = medicalrecordRepository.findByFirstNameAndLastName(firstName, lastName);
-//        if (optionalMedicalrecord.isEmpty()) {
-//            System.out.println("Dossier medical non trouvé avec le nom : " + firstName + " " + lastName);
-//        }  else {
-//            System.out.println("Dossier medical supprimé pour le nom : " + firstName + " " + lastName);
-//            medicalrecordRepository.deleteAll(optionalMedicalrecord);
-//        }
-//    }
-
-
 
     public int calculAge(Person person) {
         // Récupérer le dossier médical de la personne
@@ -57,7 +43,7 @@ public class MedicalrecordService {
             return Period.between(birthDate, LocalDate.now()).getYears();
         }
 
-        System.out.println("⚠️ Date de naissance introuvable pour : " + person.getFirstName() + " " + person.getLastName());
+        System.out.println("Date de naissance introuvable pour : " + person.getFirstName() + " " + person.getLastName());
         return 0;
     }
 

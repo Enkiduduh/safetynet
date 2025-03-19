@@ -19,7 +19,6 @@ import java.util.List;
 public class Medicalrecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private String firstName;
     private String lastName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/dd/yyyy")
@@ -33,19 +32,39 @@ public class Medicalrecord {
         return birthdate;
     }
 
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
+    }
+
     public String getLastName() {
         return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public List<String> getMedications() {
         return medications;
     }
 
+    public void setMedications(List<String> medications) {
+        this.medications = medications;
+    }
+
     public List<String> getAllergies() {
         return allergies;
+    }
+
+    public void setAllergies(List<String> allergies) {
+        this.allergies = allergies;
     }
 }

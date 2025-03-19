@@ -3,10 +3,6 @@ package com.project.safetynet.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.safetynet.model.*;
-import com.project.safetynet.repository.FirestationRepository;
-import com.project.safetynet.repository.MedicalrecordRepository;
-import com.project.safetynet.repository.PersonRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
@@ -16,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,14 +21,12 @@ public class PersonService {
     private final DataLoaderService dataLoaderService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MedicalrecordService medicalrecordService;
-    private final PersonRepository personRepository;
 
     @Autowired
-    public PersonService(DataLoaderService dataLoaderService, PersonRepository personRepository, MedicalrecordRepository medicalrecordRepository, FirestationRepository firestationRepository, MedicalrecordService medicalrecordService) {
+    public PersonService(DataLoaderService dataLoaderService, MedicalrecordService medicalrecordService) {
         this.dataLoaderService = dataLoaderService;
         this.medicalrecordService = medicalrecordService;
         this.persons = new ArrayList<>(); // Évite NullPointerException
-        this.personRepository = personRepository;
     }
 
     @PostConstruct
@@ -74,6 +68,34 @@ public class PersonService {
         }
     }
 
+    public void updatePerson(Person updatedPerson) {
+        // Récupérer la liste actuelle des personnes depuis DataLoaderService
+        List<Person> persons = dataLoaderService.getPersons();
+
+        // Chercher la personne à mettre à jour en se basant sur le prénom et le nom
+        Optional<Person> existingPersonOpt = persons.stream()
+                .filter(p -> p.getFirstName().equalsIgnoreCase(updatedPerson.getFirstName())
+                        && p.getLastName().equalsIgnoreCase(updatedPerson.getLastName()))
+                .findFirst();
+
+        if (existingPersonOpt.isPresent()) {
+            Person existingPerson = existingPersonOpt.get();
+            // Mise à jour des champs modifiables
+            existingPerson.setAddress(updatedPerson.getAddress());
+            existingPerson.setCity(updatedPerson.getCity());
+            existingPerson.setZip(updatedPerson.getZip());
+            existingPerson.setPhone(updatedPerson.getPhone());
+            existingPerson.setEmail(updatedPerson.getEmail());
+
+            // Sauvegarder la liste mise à jour dans le fichier JSON
+            dataLoaderService.savePersons(persons);
+        } else {
+            throw new RuntimeException("Personne introuvée avec le prénom " + updatedPerson.getFirstName()
+                    + " et le nom " + updatedPerson.getLastName());
+        }
+    }
+
+
     public void deletePerson(String firstName, String lastName) {
         File file = new File("src/main/resources/data.json");
 
@@ -97,30 +119,6 @@ public class PersonService {
         }
     }
 
-
-    public boolean verifyPersonBeforeSaving(Person person) {
-        if (person.getFirstName() == null || person.getFirstName().isBlank() ||
-                person.getLastName() == null || person.getLastName().isBlank() ||
-                person.getAddress() == null || person.getAddress().isBlank() ||
-                person.getPhone() == null || !person.getPhone().matches("^\\d{10}$") ||
-                person.getEmail() == null || !person.getEmail().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-
-            System.out.println("Échec de la validation : Informations manquantes ou invalides.");
-            return false;
-        }
-
-        // Vérifie si la personne existe déjà en base
-        List<Person> existingPersons = personRepository.findByFirstNameAndLastName(person.getFirstName(), person.getLastName());
-        if (!existingPersons.isEmpty()) {
-            System.out.println("Échec de la validation : Cette personne existe déjà en base.");
-            return false;
-        }
-        return true;
-    }
-
-    public List<Person> getPersonByFullName(String firstName, String lastName) {
-        return personRepository.findByFirstNameAndLastName(firstName, lastName);
-    }
 
     public List<String> getAllPersonsEmail(String city) {
         System.out.println("Recherche des emails des habitants de: " + city);

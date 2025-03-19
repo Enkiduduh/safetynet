@@ -27,6 +27,12 @@ public class PersonController {
         return "Personne ajoutée avec succès.";
     }
 
+    @PutMapping("/person")
+    public String updatePerson(@RequestBody Person updatedPerson) {
+        personService.updatePerson(updatedPerson);
+        return "Personne modifiée avec succès.";
+    }
+
     @DeleteMapping("/person")
     public String deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
         personService.deletePerson(firstName, lastName);
