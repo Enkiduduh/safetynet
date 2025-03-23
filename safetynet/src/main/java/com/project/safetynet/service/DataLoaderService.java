@@ -2,6 +2,8 @@ package com.project.safetynet.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.safetynet.model.DataWrapper;
 import com.project.safetynet.model.Firestation;
 import com.project.safetynet.model.Medicalrecord;
@@ -75,6 +77,12 @@ public class DataLoaderService {
         try {
             Map<String, Object> data = getDataFromJson();
             data.put("medicalrecords", medicalrecords);
+
+            // Enregistre le module pour gérer LocalDate
+            objectMapper.registerModule(new JavaTimeModule());
+            // Désactive l'écriture des dates comme timestamps pour respecter ton format "MM/dd/yyyy"
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
             System.out.println("Fichier JSON mis à jour avec succès.");
         } catch (IOException e) {

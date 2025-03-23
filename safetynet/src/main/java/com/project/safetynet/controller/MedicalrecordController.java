@@ -1,15 +1,14 @@
 package com.project.safetynet.controller;
 
 import com.project.safetynet.model.Medicalrecord;
-import com.project.safetynet.model.Person;
 import com.project.safetynet.service.DataLoaderService;
 import com.project.safetynet.service.MedicalrecordService;
 import com.project.safetynet.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -32,14 +31,22 @@ public class MedicalrecordController {
     }
 
     @PostMapping("/medicalrecord")
-    public String addPerson(@RequestBody Medicalrecord medicalrecord) {
-        medicalrecordService.addMedicalrecord(medicalrecord);
+    public String addMedicalrecord(@RequestBody Medicalrecord medicalrecord) {
+        try {
+            medicalrecordService.addMedicalrecord(medicalrecord);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return "Dossier ajouté avec succès.";
     }
 
     @PutMapping("/medicalrecord")
     public String updateMedicalrecord(@RequestBody Medicalrecord updatedMedicalrecord) {
-        medicalrecordService.updateMedicalrecord(updatedMedicalrecord);
+        try {
+            medicalrecordService.updateMedicalrecord(updatedMedicalrecord);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return "Dossier modifié avec succès.";
     }
 

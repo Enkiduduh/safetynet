@@ -11,7 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -31,43 +33,84 @@ public class MedicalrecordServiceTest {
     private MedicalrecordService medicalrecordService;
 
     private Person person;
-    private Medicalrecord medicalrecord;
+    private Medicalrecord originalRecord;
 
     @BeforeEach
     public void setup() {
-        // Initialisation des mocks
         MockitoAnnotations.openMocks(this);
 
         // Création d'un objet Person pour les tests
         person = new Person();
-        person.setFirstName("Brian");
-        person.setLastName("Stelzer");
-        person.setAddress("947 E. Rose Dr");
-        person.setCity("Culver");
-        person.setZip("97451");
-        person.setPhone("841-874-7784");
-        person.setEmail("bstel@email.com");
+        person.setFirstName("Ilyes");
+        person.setLastName("Soumar");
+        // Autres champs non utilisés ici
 
+        // Création d'un dossier médical correspondant (original)
+        originalRecord = new Medicalrecord();
+        originalRecord.setFirstName("Ilyes");
+        originalRecord.setLastName("Soumar");
+        originalRecord.setBirthdate(LocalDate.of(1988, 11, 4));
+        originalRecord.setMedications(Arrays.asList("doliprane:1000mg"));
+        originalRecord.setAllergies(Arrays.asList("peanut"));
 
-        // Création d'un dossier médical correspondant
-        medicalrecord = new Medicalrecord();
-        medicalrecord.setFirstName("Brian");
-        medicalrecord.setLastName("Stelzer");
-        medicalrecord.setBirthdate(LocalDate.of(1975, 6, 12));
-        medicalrecord.setMedications(Arrays.asList("ibupurin:200mg", "hydrapermazol:400mg"));
-        medicalrecord.setAllergies(Arrays.asList("nillacilan"));
+        // Préparer une liste contenant le dossier médical original
+        List<Medicalrecord> mockRecords = new ArrayList<>();
+        mockRecords.add(originalRecord);
+
+        // Forcer le stub pour que dataLoaderService.getMedicalrecords() retourne mockRecords
+        doReturn(mockRecords).when(dataLoaderService).getMedicalrecords();
+
+        // Optionnel : Remplacer la liste interne chargée via @PostConstruct dans MedicalrecordService par notre liste mockée
+        ReflectionTestUtils.setField(medicalrecordService, "medicalrecords", mockRecords);
     }
 
 //    @Test
-//    public void testCalculAge_RecordFound() {
-//        // Simuler qu'un dossier médical correspondant est trouvé
-//        doReturn(List.of(medicalrecord)).when(dataLoaderService).getMedicalrecords();
+//    public void testUpdateMedicalrecord_RecordFound() {
+//        // Préparer une liste contenant le dossier médical original
+//        List<Medicalrecord> mockRecords = new ArrayList<>();
+//        mockRecords.add(originalRecord);
 //
-//        int age = medicalrecordService.calculAge(person);
-//        // Calcule l'âge attendu
-//        int expectedAge = Period.between(LocalDate.of(1975, 6, 12), LocalDate.now()).getYears();
-//        assertEquals(expectedAge, age, "L'âge calculé devrait correspondre à l'âge attendu");
+//        // Forcer le stub pour que dataLoaderService.getMedicalrecords() retourne mockRecords
+//        doReturn(mockRecords).when(dataLoaderService).getMedicalrecords();
+//        System.out.println("Mock records: " + mockRecords);
+//
+//        // Créer un dossier de mise à jour avec les mêmes firstName et lastName que originalRecord
+//        Medicalrecord updateRecord = new Medicalrecord();
+//        updateRecord.setFirstName("Ilyes");
+//        updateRecord.setLastName("Soumar");
+//        // Modifier les champs modifiables
+//        updateRecord.setBirthdate(LocalDate.of(1980, 1, 1));  // Nouvelle date de naissance
+//        updateRecord.setMedications(Arrays.asList("newMed:100mg"));
+//        updateRecord.setAllergies(Arrays.asList("newAllergy"));
+//
+//        // Appeler la méthode à tester
+//        try {
+//            medicalrecordService.updateMedicalrecord(updateRecord);
+//            System.out.println("Mise à jour réussie.");
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        // Récupérer le dossier mis à jour dans la liste (celui qui correspond aux critères)
+//        Medicalrecord updatedRecord = mockRecords.stream()
+//                .filter(m -> m.getFirstName().equalsIgnoreCase("Ilyes") &&
+//                        m.getLastName().equalsIgnoreCase("Soumar"))
+//                .findFirst()
+//                .orElseThrow(() -> new RuntimeException("Dossier non trouvé après mise à jour"));
+//
+//        System.out.println("Updated record retrieved: " + updatedRecord);
+//
+//        // Vérifier que le dossier mis à jour a bien les nouvelles valeurs
+//        assertEquals(LocalDate.of(1980, 1, 1), updatedRecord.getBirthdate(), "La date de naissance doit être mise à jour");
+//        assertEquals(Arrays.asList("newMed:100mg"), updatedRecord.getMedications(), "Les médicaments doivent être mis à jour");
+//        assertEquals(Arrays.asList("newAllergy"), updatedRecord.getAllergies(), "Les allergies doivent être mises à jour");
+//
+//        // Vérifier que la méthode saveMedicalrecords a été appelée avec la liste mockRecords
+//        verify(dataLoaderService, times(1)).saveMedicalrecords(mockRecords);
 //    }
+
+
+
 
     @Test
     public void testCalculAge_NoRecordFound() {
@@ -78,17 +121,6 @@ public class MedicalrecordServiceTest {
         assertEquals(0, age, "Si aucun dossier n'est trouvé, l'âge doit être 0");
     }
 
-//    @Test
-//    public void testRecoverMedications_RecordFound() {
-//        // Simuler qu'un dossier médical correspondant est trouvé
-//        lenient().when(dataLoaderService.getMedicalrecords()).thenReturn(List.of(medicalrecord));
-//
-//        List<String> medications = medicalrecordService.recoverMedications(person);
-//        assertNotNull(medications, "La liste des médicaments ne doit pas être null");
-//        assertEquals(2, medications.size(), "La liste devrait contenir 2 médicaments");
-//        assertTrue(medications.contains("Med1"));
-//        assertTrue(medications.contains("Med2"));
-//    }
 
     @Test
     public void testRecoverMedications_NoRecordFound() {
@@ -102,17 +134,6 @@ public class MedicalrecordServiceTest {
         assertTrue(exception.getMessage().contains(expectedMessage));
     }
 
-//    @Test
-//    public void testRecoverAllergies_RecordFound() {
-//        // Simuler qu'un dossier médical correspondant est trouvé
-//        doReturn(List.of(medicalrecord)).when(dataLoaderService).getMedicalrecords();
-//
-//        List<String> allergies = medicalrecordService.recoverAllergies(person);
-//
-//        assertNotNull(allergies, "La liste des allergies ne doit pas être null");
-//        assertEquals(1, allergies.size(), "La liste devrait contenir 1 allergie");
-//        assertTrue(allergies.contains("Allergy1"));
-//    }
 
     @Test
     public void testRecoverAllergies_NoRecordFound() {

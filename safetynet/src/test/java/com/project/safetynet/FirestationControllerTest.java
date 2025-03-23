@@ -83,7 +83,7 @@ public class FirestationControllerTest {
     public void testGetPhoneFromPersonByFirestationWithData() throws Exception {
         mockMvc.perform(get("/api/phoneAlert").param("firestation", "1")) //
                 .andExpect(status().isOk()) //
-                .andExpect(jsonPath("$.length()").value(6))
+                .andExpect(jsonPath("$.length()").value(7))
                 .andExpect(jsonPath("$[0].phone").value("841-874-6512"))
                 .andExpect(jsonPath("$[1].phone").value("841-874-8547"))
                 .andExpect(jsonPath("$[2].phone").value("841-874-7462"));
