@@ -60,7 +60,7 @@ public class PersonService {
                 data.put("persons", persons);
 
                 // Réécrire tout le JSON (en conservant les firestations et medicalrecords)
-                objectMapper.writeValue(file, data);
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
                 System.out.println("JSON file updated successfully.");
             }
         } catch (IOException e) {

@@ -28,13 +28,19 @@ public class FirestationController {
 
     @PostMapping("/firestation")
     public String addFirestation(@RequestBody Firestation firestation) {
-        dataLoaderService.addFirestation(firestation);
+        firestationService.addFirestation(firestation);
         return "Firestation ajoutée avec succès.";
+    }
+
+    @PutMapping("/firestation")
+    public String updateFirestation(@RequestBody Firestation updatedFirestation) {
+        firestationService.updateFirestation(updatedFirestation);
+        return "Caserne modifiée avec succès.";
     }
 
     @DeleteMapping("/firestation")
     public String deletePerson(@RequestParam String address, @RequestParam Integer station) {
-        dataLoaderService.deleteFirestations(address, Integer.valueOf(String.valueOf(station)));
+        firestationService.deleteFirestation(address, Integer.valueOf(String.valueOf(station)));
         return "Firestation supprimée avec succès : " + address + " " + station;
     }
 

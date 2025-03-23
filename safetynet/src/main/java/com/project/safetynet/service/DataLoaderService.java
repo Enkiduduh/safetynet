@@ -33,11 +33,16 @@ public class DataLoaderService {
         return persons;
     }
 
+    public List<Medicalrecord> getMedicalrecords() {
+        return medicalrecords;
+    }
+
     private Map<String, Object> getDataFromJson() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             File file = new File("src/main/resources/data.json");
-            return objectMapper.readValue(file, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(file, new TypeReference<Map<String, Object>>() {
+            });
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors du chargement du fichier JSON : " + e.getMessage(), e);
         }
@@ -55,51 +60,25 @@ public class DataLoaderService {
         }
     }
 
-    public void addFirestation(Firestation firestation) {
-        firestations.add(firestation);
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void saveFirestations(List<Firestation> firestations) {
         try {
-            objectMapper.writeValue(new File("data.json"), firestations);
+            Map<String, Object> data = getDataFromJson();
+            data.put("firestations", firestations);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
+            System.out.println("Fichier JSON mis à jour avec succès.");
         } catch (IOException e) {
-            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la sauvegarde du fichier JSON : " + e.getMessage(), e);
         }
     }
 
-    public void deleteFirestations(String address, Integer station) {
-        firestations.removeIf(p -> p.getAddress().equals(address) && Objects.equals(p.getStation(), station));
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void saveMedicalrecords(List<Medicalrecord> medicalrecords) {
         try {
-            objectMapper.writeValue(new File("data.json"), firestations);
+            Map<String, Object> data = getDataFromJson();
+            data.put("medicalrecords", medicalrecords);
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
+            System.out.println("Fichier JSON mis à jour avec succès.");
         } catch (IOException e) {
-            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
-        }
-    }
-
-    public List<Medicalrecord> getMedicalrecords() {
-        return medicalrecords;
-    }
-
-    public void addMedicalrecord(Medicalrecord medicalrecord) {
-        medicalrecords.add(medicalrecord);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(new File("data.json"), medicalrecords);
-        } catch (IOException e) {
-            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
-        }
-    }
-
-    public void deleteMedicalrecord(String firstName, String lastName) {
-        medicalrecords.removeIf(p -> p.getFirstName().equals(firstName) && p.getLastName().equals(lastName));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(new File("data.json"), medicalrecords);
-        } catch (IOException e) {
-            throw new RuntimeException("Erreur de l'écriture du fichier JSON : " + e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de la sauvegarde du fichier JSON : " + e.getMessage(), e);
         }
     }
 

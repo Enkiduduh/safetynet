@@ -19,6 +19,7 @@ public class FirestationService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MedicalrecordService medicalrecordService;
     private List<Firestation> firestations;
+
     @Autowired
     public FirestationService(DataLoaderService dataLoaderService, MedicalrecordService medicalrecordService) {
         this.dataLoaderService = dataLoaderService;
@@ -57,7 +58,7 @@ public class FirestationService {
                 data.put("firestations", firestations);
 
                 // Réécrire tout le JSON (en conservant les persons et medicalrecords)
-                objectMapper.writeValue(file, data);
+                objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
                 System.out.println("JSON file updated successfully.");
             }
         } catch (IOException e) {
@@ -65,6 +66,26 @@ public class FirestationService {
         }
     }
 
+    public void updateFirestation(Firestation updateFirestation) {
+        // Récupérer la liste actuelle des casernes depuis DataLoaderService
+        List<Firestation> firestations = dataLoaderService.getFirestations();
+
+        // Chercher la caserne à mettre à jour en se basant sur l'adresse
+        Optional<Firestation> existingFirestationOpt = firestations.stream()
+                .filter(m -> m.getAddress().equalsIgnoreCase(updateFirestation.getAddress()))
+                .findFirst();
+
+        if (existingFirestationOpt.isPresent()) {
+            Firestation existingFirestation = existingFirestationOpt.get();
+            // Mise à jour des champs modifiables
+            existingFirestation.setStation(updateFirestation.getStation());
+
+            // Sauvegarder la liste mise à jour dans le fichier JSON
+            dataLoaderService.saveFirestations(firestations);
+        } else {
+            throw new RuntimeException("Caserne non trouvée avec l'adresse " + updateFirestation.getAddress());
+        }
+    }
 
     public void deleteFirestation(String address, int station) {
         File file = new File("src/main/resources/data.json");
@@ -91,6 +112,8 @@ public class FirestationService {
             throw new RuntimeException("Erreur lors de l'écriture du fichier JSON : " + e.getMessage(), e);
         }
     }
+
+
 
     public List<PersonDTO> getPersonsByFirestation(int station) {
         System.out.println("Recherche des adresses pour la station: " + station);
