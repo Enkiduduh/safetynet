@@ -71,6 +71,7 @@ public class PersonService {
     public void updatePerson(Person updatedPerson) {
         // Récupérer la liste actuelle des personnes depuis DataLoaderService
         List<Person> persons = dataLoaderService.getPersons();
+        System.out.println("persons");
 
         // Chercher la personne à mettre à jour en se basant sur le prénom et le nom
         Optional<Person> existingPersonOpt = persons.stream()

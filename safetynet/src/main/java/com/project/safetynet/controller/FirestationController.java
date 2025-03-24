@@ -27,21 +27,20 @@ public class FirestationController {
     }
 
     @PostMapping("/firestation")
-    public String addFirestation(@RequestBody Firestation firestation) {
+    public Firestation addFirestation(@RequestBody Firestation firestation) {
         firestationService.addFirestation(firestation);
-        return "Firestation ajoutée avec succès.";
+        return firestation;
     }
 
     @PutMapping("/firestation")
-    public String updateFirestation(@RequestBody Firestation updatedFirestation) {
+    public Firestation updateFirestation(@RequestBody Firestation updatedFirestation) {
         firestationService.updateFirestation(updatedFirestation);
-        return "Caserne modifiée avec succès.";
+        return updatedFirestation;
     }
 
     @DeleteMapping("/firestation")
-    public String deletePerson(@RequestParam String address, @RequestParam Integer station) {
+    public void deletePerson(@RequestParam String address, @RequestParam Integer station) {
         firestationService.deleteFirestation(address, Integer.valueOf(String.valueOf(station)));
-        return "Firestation supprimée avec succès : " + address + " " + station;
     }
 
     @GetMapping("/firestation")

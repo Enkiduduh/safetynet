@@ -31,28 +31,27 @@ public class MedicalrecordController {
     }
 
     @PostMapping("/medicalrecord")
-    public String addMedicalrecord(@RequestBody Medicalrecord medicalrecord) {
+    public Medicalrecord addMedicalrecord(@RequestBody Medicalrecord medicalrecord) {
         try {
             medicalrecordService.addMedicalrecord(medicalrecord);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return "Dossier ajouté avec succès.";
+        return medicalrecord;
     }
 
     @PutMapping("/medicalrecord")
-    public String updateMedicalrecord(@RequestBody Medicalrecord updatedMedicalrecord) {
+    public Medicalrecord updateMedicalrecord(@RequestBody Medicalrecord updatedMedicalrecord) {
         try {
             medicalrecordService.updateMedicalrecord(updatedMedicalrecord);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return "Dossier modifié avec succès.";
+        return updatedMedicalrecord;
     }
 
     @DeleteMapping("/medicalrecord")
-    public String deteleMedicalrecord(@RequestParam String firstName, @RequestParam String lastName) {
+    public void deteleMedicalrecord(@RequestParam String firstName, @RequestParam String lastName) {
         medicalrecordService.deleteMedicalrecord(firstName, lastName);
-        return "Dossier supprimé avec succès : " + firstName + " " + lastName;
     }
 }

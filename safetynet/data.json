@@ -140,8 +140,8 @@
   "firstName" : "Ilyes",
   "lastName" : "Soumar",
   "birthdate" : "04/11/1988",
-  "medications" : [ "coca:1mg" ],
-  "allergies" : [ ]
+  "medications" : [ "doliprane:1000mg" ],
+  "allergies" : [ "peanut" ]
 }, {
   "firstName" : "Ilyes",
   "lastName" : "Soumar",

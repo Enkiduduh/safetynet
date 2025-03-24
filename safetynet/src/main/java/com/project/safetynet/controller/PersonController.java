@@ -22,21 +22,20 @@ public class PersonController {
     }
 
     @PostMapping("/person")
-    public String addPerson(@RequestBody Person person) {
+    public Person  addPerson(@RequestBody Person person) {
         personService.addPerson(person);
-        return "Personne ajoutée avec succès.";
+        return person;
     }
 
     @PutMapping("/person")
-    public String updatePerson(@RequestBody Person updatedPerson) {
+    public Person updatePerson(@RequestBody Person updatedPerson) {
         personService.updatePerson(updatedPerson);
-        return "Personne modifiée avec succès.";
+        return updatedPerson;
     }
 
     @DeleteMapping("/person")
-    public String deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
+    public void deletePerson(@RequestParam String firstName, @RequestParam String lastName) {
         personService.deletePerson(firstName, lastName);
-        return "Personne supprimée avec succès : " + firstName + " " + lastName;
     }
 
     @GetMapping("/childAlert")

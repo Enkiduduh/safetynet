@@ -39,10 +39,13 @@ public class DataLoaderService {
         return medicalrecords;
     }
 
-    private Map<String, Object> getDataFromJson() {
+    // Ajoute ce champ pour permettre la configuration du chemin du fichier
+    private String filePath = "src/main/resources/data.json";
+
+    public Map<String, Object> getDataFromJson() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            File file = new File("src/main/resources/data.json");
+            File file = new File(filePath);
             return objectMapper.readValue(file, new TypeReference<Map<String, Object>>() {
             });
         } catch (IOException e) {
@@ -55,8 +58,7 @@ public class DataLoaderService {
             // On suppose que le fichier JSON contient un objet global avec une clé "persons"
             Map<String, Object> data = getDataFromJson(); // méthode pour charger l'ensemble des données
             data.put("persons", persons);
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
-            System.out.println("Fichier JSON mis à jour avec succès.");
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), data);
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de la sauvegarde du fichier JSON : " + e.getMessage(), e);
         }
@@ -66,8 +68,7 @@ public class DataLoaderService {
         try {
             Map<String, Object> data = getDataFromJson();
             data.put("firestations", firestations);
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
-            System.out.println("Fichier JSON mis à jour avec succès.");
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), data);
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de la sauvegarde du fichier JSON : " + e.getMessage(), e);
         }
@@ -83,8 +84,7 @@ public class DataLoaderService {
             // Désactive l'écriture des dates comme timestamps pour respecter ton format "MM/dd/yyyy"
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File("src/main/resources/data.json"), data);
-            System.out.println("Fichier JSON mis à jour avec succès.");
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), data);
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de la sauvegarde du fichier JSON : " + e.getMessage(), e);
         }
@@ -102,7 +102,6 @@ public class DataLoaderService {
             this.persons = data.getPersons();  // Chargement des données
             this.firestations = data.getFirestations();
             this.medicalrecords = data.getMedicalrecords();
-            System.out.println("Données chargées avec succès !");
 
         } catch (IOException e) {
             throw new RuntimeException("Erreur de lecture du fichier JSON : " + e.getMessage(), e);

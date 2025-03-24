@@ -230,6 +230,9 @@
     "station" : 2
   }, {
     "address" : "1 rue Springboot",
+    "station" : 3
+  }, {
+    "address" : "1 rue Springboot",
     "station" : 1
   }, {
     "address" : "1 rue Springboot",
@@ -383,7 +386,7 @@
     "firstName" : "Ilyes",
     "lastName" : "Soumar",
     "birthdate" : "04/11/1988",
-    "medications" : [ "coca:1mg" ],
-    "allergies" : [ ]
+    "medications" : [ "doliprane:1000mg" ],
+    "allergies" : [ "peanut" ]
   } ]
 }

@@ -30,12 +30,10 @@ public class FirestationService {
     @PostConstruct
     public void init() {
         this.firestations = new ArrayList<>(dataLoaderService.getFirestations()); // Charge les données au démarrage
-        System.out.println("Person list initialized with " + firestations.size() + " persons.");
     }
 
     public List<Firestation> getFirestations() {
         List<Firestation> firestations = dataLoaderService.getFirestations();
-        System.out.println("Firestation list size: " + (firestations != null ? firestations.size() : "null"));
         return firestations;
     }
 
@@ -52,14 +50,10 @@ public class FirestationService {
 
             if (firestation != null) {
                 firestations.add(firestation);
-                System.out.println("Person added: " + firestation.getAddress() + " " + firestation.getStation());
-
                 // Mettre à jour la liste des firestations dans le JSON complet
                 data.put("firestations", firestations);
-
                 // Réécrire tout le JSON (en conservant les persons et medicalrecords)
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
-                System.out.println("JSON file updated successfully.");
             }
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de l'écriture du fichier JSON : " + e.getMessage(), e);
@@ -103,10 +97,8 @@ public class FirestationService {
                         address.equals(p.get("address")) && station == (Integer) p.get("station")
                 );
             }
-
             // Réécrire le JSON complet avec les données mises à jour
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
-            System.out.println("JSON file updated successfully.");
 
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de l'écriture du fichier JSON : " + e.getMessage(), e);
@@ -116,8 +108,6 @@ public class FirestationService {
 
 
     public List<PersonDTO> getPersonsByFirestation(int station) {
-        System.out.println("Recherche des adresses pour la station: " + station);
-
         // Trouver les adresses associées à cette firestation
         List<String> addresses = dataLoaderService.getFirestations().stream()
                 .filter(firestation -> firestation.getStation() == station)
@@ -125,24 +115,19 @@ public class FirestationService {
                 .collect(Collectors.toList());
 
         if (addresses.isEmpty()) {
-            System.out.println("Aucune adresse trouvée pour cette station.");
             return new ArrayList<>();
         }
-
-        System.out.println("Adresses trouvées: " + addresses);
 
         List<Person> persons = dataLoaderService.getPersons().stream()
                 .filter(person -> addresses.contains(person.getAddress())) //  Remplacement de personRepository
                 .collect(Collectors.toList());
 
-        System.out.println("👥 Personnes trouvées: " + persons.size());
         return persons.stream()
                 .map(person -> new PersonDTO(person.getFirstName(), person.getLastName(), person.getAddress(), person.getPhone()))
                 .collect(Collectors.toList());
     }
 
     public List<PersonPhoneDTO> getPhoneFromPersonByFirestation(int station) {
-        System.out.println("Recherche des adresses pour la station: " + station);
 
         // Trouver les numéros de téléphones associés à cette firestation
         List<String> addresses = dataLoaderService.getFirestations().stream()
@@ -151,11 +136,9 @@ public class FirestationService {
                 .collect(Collectors.toList());
 
         if (addresses.isEmpty()) {
-            System.out.println("Aucune adresse trouvée pour cette station.");
             return new ArrayList<>();
         }
 
-        System.out.println("Adresses trouvées: " + addresses);
 
         // Trouver les personnes vivant aux adresses associées
         List<Person> persons = dataLoaderService.getPersons().stream()
@@ -177,10 +160,8 @@ public class FirestationService {
                 .toList();
 
         if (addresses.isEmpty()) {
-            System.out.println("Aucune adresse trouvée pour cette station.");
             return new HashMap<>();
         }
-        System.out.println("Adresses trouvées: " + addresses);
 
         List<Person> persons = dataLoaderService.getPersons().stream()
                 .filter(person -> addresses.contains(person.getAddress())) //  Remplacement de personRepository
